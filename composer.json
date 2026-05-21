@@ -1,8 +1,28 @@
 {
     "name": "andretmblkk/dfdgenerator",
-    "description": "A Laravel package for generating Data Flow Diagram documentation from routes, controllers, models, and database access.",
+    "description": "Generate Data Flow Diagram documentation automatically from Laravel routes, controllers, models, and database access.",
+    "keywords": [
+        "laravel",
+        "dfd",
+        "data-flow-diagram",
+        "documentation",
+        "diagram",
+        "static-analysis",
+        "artisan"
+    ],
+    "homepage": "https://github.com/Andretmblkk/DFDgenerator",
     "type": "library",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Andre Tumbelaka",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/Andretmblkk/DFDgenerator/issues",
+        "source": "https://github.com/Andretmblkk/DFDgenerator"
+    },
     "autoload": {
         "psr-4": {
             "LaravelDfd\\": "src/"

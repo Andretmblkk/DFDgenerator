@@ -23,32 +23,13 @@ Project ini dibuat oleh Andre Tumbelaka.
 
 ## Installation
 
-Kalau package sudah dipublish ke Packagist, install langsung:
+Install langsung lewat Composer:
 
 ```bash
 composer require andretmblkk/dfdgenerator
 ```
 
-Kalau belum ada di Packagist, install dari GitHub repository dulu. Tambahkan ini ke `composer.json` project Laravel yang mau dianalisis:
-
-```json
-{
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/Andretmblkk/DFDgenerator.git"
-    }
-  ]
-}
-```
-
-Lalu install branch GitHub:
-
-```bash
-composer require andretmblkk/dfdgenerator:dev-main
-```
-
-Laravel akan auto-discover service provider package ini.
+Laravel akan auto-discover service provider package ini. Setelah package tersedia di Packagist, user tidak perlu menambahkan `repositories` manual ke `composer.json`. Ini flow yang benar, bukan ritual tempel-tempel JSON yang bikin capek.
 
 Kalau auto-discovery dimatikan, daftarkan provider manual di `config/app.php`:
 
