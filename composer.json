@@ -1,0 +1,38 @@
+{
+    "name": "laravel-dfd/laravel-dfd",
+    "description": "A Laravel package foundation for generating data flow documentation.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "LaravelDfd\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaravelDfd\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "illuminate/console": "^10.0|^11.0|^12.0",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "nikic/php-parser": "^5.7"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.11",
+        "phpunit/phpunit": "^13.1"
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaravelDfd\\LaravelDfdServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

@@ -1,0 +1,10 @@
+/vendor/
+/.phpunit.result.cache
+/.phpunit.cache/
+/coverage/
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+.env
+storage/dfd/
