@@ -6,6 +6,7 @@ namespace LaravelDfd\Scanner;
 
 use Closure;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 final class RouteScanner
 {
@@ -17,8 +18,14 @@ final class RouteScanner
         $routes = [];
 
         foreach (Route::getRoutes() as $route) {
+            $uri = $this->routeUri($route);
+
+            if ($this->shouldIgnore($uri)) {
+                continue;
+            }
+
             $routes[] = [
-                'uri' => $this->routeUri($route),
+                'uri' => $uri,
                 'methods' => $this->routeMethods($route),
                 'action' => $this->routeAction($route),
             ];
@@ -34,6 +41,19 @@ final class RouteScanner
         }
 
         return property_exists($route, 'uri') ? (string) $route->uri : '';
+    }
+
+    private function shouldIgnore(string $uri): bool
+    {
+        $patterns = config('laravel-dfd.ignored_routes', config('dfd.ignored_routes', []));
+
+        foreach ((array) $patterns as $pattern) {
+            if (is_string($pattern) && Str::is($pattern, $uri)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

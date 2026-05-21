@@ -1,6 +1,6 @@
 {
-    "name": "laravel-dfd/laravel-dfd",
-    "description": "A Laravel package foundation for generating data flow documentation.",
+    "name": "andretmblkk/dfdgenerator",
+    "description": "A Laravel package for generating Data Flow Diagram documentation from routes, controllers, models, and database access.",
     "type": "library",
     "license": "MIT",
     "autoload": {

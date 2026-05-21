@@ -28,6 +28,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Web Viewer Route
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, the package registers a live DFD viewer. After installing
+    | the package, run your Laravel app and open /dfd. No manual JSON wiring.
+    |
+    */
+
+    'route' => [
+        'enabled' => env('DFD_ROUTE_ENABLED', true),
+        'prefix' => env('DFD_ROUTE_PREFIX', 'dfd'),
+        'middleware' => ['web'],
+    ],
+
+    'max_level' => (int) env('DFD_MAX_LEVEL', 3),
+
+    'ignored_routes' => [
+        'dfd',
+        'dfd/*',
+        '_ignition/*',
+        'sanctum/*',
+        'telescope/*',
+        'horizon/*',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Semantic Process Groups
     |--------------------------------------------------------------------------
     |

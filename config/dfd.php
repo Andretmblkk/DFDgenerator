@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+$defaults = require __DIR__ . '/laravel-dfd.php';
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -17,5 +19,11 @@ return [
 
     'output_path' => storage_path('dfd'),
 
-    'groups' => (require __DIR__ . '/laravel-dfd.php')['groups'],
+    'route' => $defaults['route'],
+
+    'max_level' => $defaults['max_level'],
+
+    'ignored_routes' => $defaults['ignored_routes'],
+
+    'groups' => $defaults['groups'],
 ];

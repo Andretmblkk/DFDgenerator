@@ -22,6 +22,8 @@ final class LaravelDfdServiceProvider extends ServiceProvider
             __DIR__ . '/../config/dfd.php' => config_path('dfd.php'),
         ], 'dfd-config');
 
+        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 DfdCommand::class,

@@ -1,21 +1,19 @@
 # Laravel DFD Generator
 
-Laravel DFD Generator adalah package Laravel untuk membuat dokumentasi Data Flow Diagram (DFD) otomatis dari aplikasi Laravel. Package ini membaca route, controller action, pemakaian model Eloquent, akses database, lalu menghasilkan dokumentasi DFD dalam bentuk HTML viewer, SVG, JSON, atau Mermaid.
+Laravel DFD Generator adalah package Laravel untuk membuat Data Flow Diagram (DFD) otomatis dari aplikasi Laravel. Package ini membaca route, controller action, pemakaian model Eloquent, akses database, lalu menampilkan DFD lewat web viewer `/dfd` atau export static HTML/SVG/JSON/Mermaid.
 
 Project ini dibuat oleh Andre Tumbelaka.
 
 ## Fitur
 
-- Scan route Laravel dan controller action.
+- Auto-scan route Laravel dan controller action.
 - Parse source PHP memakai `nikic/php-parser`.
 - Deteksi proses bisnis dari route/controller.
 - Deteksi model Eloquent dan table database.
-- Bentuk Intermediate Representation (IR) untuk DFD.
 - Generate DFD Level 0 sampai Level 3.
-- Export HTML viewer interaktif.
-- Export SVG dan JSON per level.
-- Export Mermaid legacy.
-- Integrasi Artisan command: `php artisan dfd:generate`.
+- Live web viewer di `/dfd` tanpa sambung JSON manual.
+- Export static HTML viewer, SVG, JSON, dan Mermaid.
+- Artisan command: `php artisan dfd:generate`.
 
 ## Requirement
 
@@ -23,11 +21,15 @@ Project ini dibuat oleh Andre Tumbelaka.
 - Laravel 10, 11, atau 12.
 - Composer.
 
-## Instalasi dari GitHub
+## Installation
 
-Karena package ini belum dipublish ke Packagist, install lewat repository GitHub.
+Kalau package sudah dipublish ke Packagist, install langsung:
 
-Tambahkan repository ke `composer.json` project Laravel yang mau dianalisis:
+```bash
+composer require andretmblkk/dfdgenerator
+```
+
+Kalau belum ada di Packagist, install dari GitHub repository dulu. Tambahkan ini ke `composer.json` project Laravel yang mau dianalisis:
 
 ```json
 {
@@ -40,15 +42,15 @@ Tambahkan repository ke `composer.json` project Laravel yang mau dianalisis:
 }
 ```
 
-Lalu install package:
+Lalu install branch GitHub:
 
 ```bash
-composer require laravel-dfd/laravel-dfd:dev-master
+composer require andretmblkk/dfdgenerator:dev-main
 ```
 
 Laravel akan auto-discover service provider package ini.
 
-Kalau auto-discovery dimatikan, daftarkan provider secara manual di `config/app.php`:
+Kalau auto-discovery dimatikan, daftarkan provider manual di `config/app.php`:
 
 ```php
 'providers' => [
@@ -56,43 +58,76 @@ Kalau auto-discovery dimatikan, daftarkan provider secara manual di `config/app.
 ],
 ```
 
-## Publish konfigurasi
-
-Jalankan:
+## Publish config
 
 ```bash
 php artisan vendor:publish --tag=dfd-config
 ```
 
-File konfigurasi yang akan dibuat:
+File yang dibuat:
 
 ```text
-config/dfd.php
 config/laravel-dfd.php
+config/dfd.php
 ```
 
-Konfigurasi utama:
+## Usage: live viewer
+
+Jalankan Laravel app:
+
+```bash
+php artisan serve
+```
+
+Buka DFD viewer:
+
+```text
+http://localhost:8000/dfd
+```
+
+Nah ini flow yang benar. Tidak perlu generate JSON lalu sambung manual ke frontend. Package akan scan route/controller aplikasi saat halaman `/dfd` dibuka, lalu render viewer langsung.
+
+## Konfigurasi route viewer
+
+Default route:
 
 ```php
-'system_name' => env('DFD_SYSTEM_NAME', env('APP_NAME', 'Laravel Application') . ' System'),
-'output_path' => storage_path('dfd'),
+'route' => [
+    'enabled' => env('DFD_ROUTE_ENABLED', true),
+    'prefix' => env('DFD_ROUTE_PREFIX', 'dfd'),
+    'middleware' => ['web'],
+],
 ```
 
-Kalau mau ganti nama sistem di diagram, tambahkan ke `.env` aplikasi Laravel:
+Ubah prefix lewat `.env`:
+
+```env
+DFD_ROUTE_PREFIX=dfd
+```
+
+Kalau ingin disable viewer:
+
+```env
+DFD_ROUTE_ENABLED=false
+```
+
+## Konfigurasi nama sistem
+
+Tambahkan ke `.env` aplikasi Laravel:
 
 ```env
 DFD_SYSTEM_NAME="Nama Sistem Saya"
 ```
 
-## Cara pakai
+## Export static HTML/SVG/JSON
 
-Generate dokumentasi DFD lengkap:
+Kalau tetap butuh file static:
 
 ```bash
 php artisan dfd:generate
 ```
 
-Default output akan masuk ke:
+Default output:
 
 ```text
 storage/dfd
@@ -114,35 +149,25 @@ storage/dfd/assets/styles.css
 storage/dfd/assets/viewer.js
 ```
 
-Buka hasilnya di browser:
-
-```text
-storage/dfd/index.html
-```
-
-## Custom output folder
-
-Kalau mau output ke folder lain:
+Custom output folder:
 
 ```bash
 php artisan dfd:generate --output=public/dfd
 ```
 
-Lalu buka:
+Buka:
 
 ```text
 public/dfd/index.html
 ```
 
-## Export Mermaid
-
-Untuk generate Mermaid diagram legacy:
+## Export Mermaid legacy
 
 ```bash
 php artisan dfd:generate --format=mermaid --output=storage/dfd/diagram.mmd
 ```
 
-Untuk export JSON legacy:
+Export JSON legacy:
 
 ```bash
 php artisan dfd:generate --format=mermaid --json --output=storage/dfd/diagram.json
@@ -156,14 +181,14 @@ Kalau command gagal dan butuh detail error:
 php artisan dfd:generate --debug
 ```
 
-## Contoh workflow pemakaian
+## Cara kerja singkat
 
-1. Install package ke project Laravel.
-2. Publish config.
-3. Pastikan route dan controller aplikasi sudah terbaca Laravel.
-4. Jalankan `php artisan dfd:generate`.
-5. Buka `storage/dfd/index.html`.
-6. Review diagram Level 0 sampai Level 3.
+1. Package membaca route Laravel.
+2. Action controller diparse dari source code.
+3. Pemakaian model/table dideteksi.
+4. Proses bisnis dikelompokkan berdasarkan config semantic groups.
+5. DFD Level 0 sampai Level 3 dibangun.
+6. Viewer `/dfd` menampilkan diagram langsung.
 
 ## Development package
 
@@ -204,10 +229,13 @@ composer dump-autoload
 config/
   dfd.php
   laravel-dfd.php
+routes/
+  web.php
 src/
   Builder/
   Commands/
   Generator/
+  Http/
   IR/
   Parser/
   Renderer/
@@ -223,7 +251,7 @@ README.md
 
 ## Catatan penting
 
-Package ini menganalisis struktur aplikasi berdasarkan route, controller, model, dan pemakaian database yang bisa dibaca secara statis. Kalau logic aplikasi terlalu dinamis, misalnya route/controller dibuat runtime secara ajaib, hasil diagram bisa kurang lengkap. Ya namanya juga static analysis, bukan dukun.
+Package ini menganalisis struktur aplikasi berdasarkan route, controller, model, dan pemakaian database yang bisa dibaca secara statis. Kalau logic aplikasi terlalu dinamis, misalnya route/controller dibuat runtime secara ajaib, hasil diagram bisa kurang lengkap. Ya namanya static analysis, bukan dukun santet.
 
 ## License
 

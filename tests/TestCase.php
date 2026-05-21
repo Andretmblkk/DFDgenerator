@@ -18,4 +18,9 @@ abstract class TestCase extends OrchestraTestCase
             LaravelDfdServiceProvider::class,
         ];
     }
+
+    protected function defineEnvironment($app): void
+    {
+        $app['config']->set('app.key', 'base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=');
+    }
 }
