@@ -18,7 +18,10 @@ final class DfdWebRouteTest extends TestCase
         $response->assertOk();
         $response->assertSee('Laravel DFD Generator', false);
         $response->assertSee('window.DFD_DATA', false);
-        $response->assertSee('assets/viewer.js', false);
+        $response->assertSee('http://localhost/dfd/assets/styles.css', false);
+        $response->assertSee('http://localhost/dfd/assets/viewer.js', false);
+        $response->assertDontSee('href="assets/styles.css"', false);
+        $response->assertDontSee('src="assets/viewer.js"', false);
     }
 
     public function test_dfd_assets_are_served_by_package_routes(): void
@@ -30,6 +33,16 @@ final class DfdWebRouteTest extends TestCase
         $this->get('/dfd/assets/viewer.js')
             ->assertOk()
             ->assertHeader('content-type', 'application/javascript; charset=UTF-8');
+    }
+
+    public function test_package_assets_can_be_published_to_public_vendor_directory(): void
+    {
+        $paths = \LaravelDfd\LaravelDfdServiceProvider::pathsToPublish(
+            \LaravelDfd\LaravelDfdServiceProvider::class,
+            'dfd-assets'
+        );
+
+        self::assertContains(public_path('vendor/dfdgenerator'), array_values($paths));
     }
 
     public function test_dfd_route_can_be_disabled_from_config(): void

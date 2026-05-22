@@ -52,6 +52,20 @@ config/laravel-dfd.php
 config/dfd.php
 ```
 
+## Publish assets
+
+Live viewer `/dfd` langsung bekerja setelah install karena package menyajikan CSS/JS lewat route asset internal. Kalau ingin menyalin asset package ke public path Laravel standar, jalankan:
+
+```bash
+php artisan vendor:publish --tag=dfd-assets
+```
+
+File akan dipublish ke:
+
+```text
+public/vendor/dfdgenerator
+```
+
 ## Usage: live viewer
 
 Jalankan Laravel app:

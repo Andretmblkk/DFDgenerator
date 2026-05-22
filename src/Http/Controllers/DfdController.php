@@ -17,7 +17,10 @@ final class DfdController
         $maxLevel = (int) config('laravel-dfd.max_level', 3);
         $hierarchy = $builder->build($maxLevel);
 
-        return response($renderer->render($hierarchy), 200)
+        return response($renderer->render($hierarchy, [
+            'styles' => asset($this->routeAssetPath('styles.css')),
+            'script' => asset($this->routeAssetPath('viewer.js')),
+        ]), 200)
             ->header('Content-Type', 'text/html; charset=UTF-8');
     }
 
@@ -42,5 +45,13 @@ final class DfdController
         if (! (bool) config('laravel-dfd.route.enabled', true)) {
             abort(404);
         }
+    }
+
+    private function routeAssetPath(string $filename): string
+    {
+        $prefix = trim((string) config('laravel-dfd.route.prefix', 'dfd'), '/');
+        $path = trim($prefix . '/assets/' . $filename, '/');
+
+        return $path === '' ? 'assets/' . $filename : $path;
     }
 }
