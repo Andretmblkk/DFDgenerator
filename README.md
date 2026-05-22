@@ -1,6 +1,6 @@
 # Laravel DFD Generator
 
-Laravel DFD Generator adalah package Laravel untuk membuat Data Flow Diagram (DFD) otomatis dari aplikasi Laravel. Package ini membaca route, controller action, pemakaian model Eloquent, akses database, lalu menampilkan DFD lewat web viewer `/dfd` atau export static HTML/SVG/JSON/Mermaid.
+Laravel DFD Generator adalah package Laravel untuk membuat Data Flow Diagram (DFD) otomatis dari aplikasi Laravel. Package ini membaca route, controller action, pemakaian model Eloquent, dan akses database, lalu menampilkan hasilnya lewat live web viewer `/dfd` atau export static HTML/SVG/JSON/Mermaid.
 
 Project ini dibuat oleh Andre Tumbelaka.
 
@@ -11,7 +11,9 @@ Project ini dibuat oleh Andre Tumbelaka.
 - Deteksi proses bisnis dari route/controller.
 - Deteksi model Eloquent dan table database.
 - Generate DFD Level 0 sampai Level 3.
-- Live web viewer di `/dfd` tanpa sambung JSON manual.
+- Live web viewer modern di `/dfd` tanpa sambung JSON manual.
+- Dark UI, sidebar hierarchy, toolbar zoom/pan, minimap, dan export.
+- CSS/JS viewer diload otomatis lewat route asset package.
 - Export static HTML viewer, SVG, JSON, dan Mermaid.
 - Artisan command: `php artisan dfd:generate`.
 
@@ -29,7 +31,7 @@ Install langsung lewat Composer:
 composer require andretmblkk/dfdgenerator
 ```
 
-Laravel akan auto-discover service provider package ini. Setelah package tersedia di Packagist, user tidak perlu menambahkan `repositories` manual ke `composer.json`. Ini flow yang benar, bukan ritual tempel-tempel JSON yang bikin capek.
+Laravel akan auto-discover service provider package ini. Setelah install, route `/dfd` langsung tersedia selama config route package aktif.
 
 Kalau auto-discovery dimatikan, daftarkan provider manual di `config/app.php`:
 
@@ -39,7 +41,17 @@ Kalau auto-discovery dimatikan, daftarkan provider manual di `config/app.php`:
 ],
 ```
 
+## Update package
+
+Kalau package sudah pernah terinstall dan ingin mengambil versi terbaru:
+
+```bash
+composer update andretmblkk/dfdgenerator
+```
+
 ## Publish config
+
+Publish config bersifat opsional. Jalankan ini hanya kalau ingin mengubah prefix route, middleware, output path, semantic groups, atau setting lain.
 
 ```bash
 php artisan vendor:publish --tag=dfd-config
@@ -54,7 +66,14 @@ config/dfd.php
 
 ## Publish assets
 
-Live viewer `/dfd` langsung bekerja setelah install karena package menyajikan CSS/JS lewat route asset internal. Kalau ingin menyalin asset package ke public path Laravel standar, jalankan:
+Live viewer `/dfd` langsung bekerja setelah install karena package menyajikan CSS/JS lewat route asset internal:
+
+```text
+/dfd/assets/styles.css
+/dfd/assets/viewer.js
+```
+
+Artinya user tidak wajib menjalankan `vendor:publish` agar UI tampil modern. Kalau ingin menyalin asset package ke public path Laravel standar, jalankan:
 
 ```bash
 php artisan vendor:publish --tag=dfd-assets
@@ -68,7 +87,7 @@ public/vendor/dfdgenerator
 
 ## Usage: live viewer
 
-Jalankan Laravel app:
+Jalankan aplikasi Laravel:
 
 ```bash
 php artisan serve
@@ -80,7 +99,9 @@ Buka DFD viewer:
 http://localhost:8000/dfd
 ```
 
-Nah ini flow yang benar. Tidak perlu generate JSON lalu sambung manual ke frontend. Package akan scan route/controller aplikasi saat halaman `/dfd` dibuka, lalu render viewer langsung.
+Package akan scan route/controller aplikasi saat halaman `/dfd` dibuka, lalu render viewer langsung. Tidak perlu generate JSON atau menghubungkan frontend manual.
+
+Viewer route mode memakai asset URL absolut dari Laravel `asset()`, sehingga `/dfd` tetap benar meskipun dibuka tanpa trailing slash. CSS dan JS akan diload dari `/dfd/assets/...`, bukan dari `/assets/...`.
 
 ## Konfigurasi route viewer
 
@@ -104,6 +125,25 @@ Kalau ingin disable viewer:
 
 ```env
 DFD_ROUTE_ENABLED=false
+```
+
+Kalau prefix diubah, asset viewer ikut menyesuaikan. Contoh:
+
+```env
+DFD_ROUTE_PREFIX=developer/dfd
+```
+
+Viewer:
+
+```text
+http://localhost:8000/developer/dfd
+```
+
+Asset:
+
+```text
+http://localhost:8000/developer/dfd/assets/styles.css
+http://localhost:8000/developer/dfd/assets/viewer.js
 ```
 
 ## Konfigurasi nama sistem
@@ -144,6 +184,15 @@ storage/dfd/assets/styles.css
 storage/dfd/assets/viewer.js
 ```
 
+Static HTML mode memakai asset relatif:
+
+```html
+<link rel="stylesheet" href="assets/styles.css">
+<script src="assets/viewer.js"></script>
+```
+
+Karena itu `storage/dfd/index.html` bisa dibuka sebagai file static selama folder `assets` tetap berada di sebelah `index.html`.
+
 Custom output folder:
 
 ```bash
@@ -154,6 +203,12 @@ Buka:
 
 ```text
 public/dfd/index.html
+```
+
+Kalau output diarahkan ke `public/dfd`, viewer static juga bisa dibuka lewat web server:
+
+```text
+http://localhost:8000/dfd/index.html
 ```
 
 ## Export Mermaid legacy
@@ -183,7 +238,8 @@ php artisan dfd:generate --debug
 3. Pemakaian model/table dideteksi.
 4. Proses bisnis dikelompokkan berdasarkan config semantic groups.
 5. DFD Level 0 sampai Level 3 dibangun.
-6. Viewer `/dfd` menampilkan diagram langsung.
+6. Viewer route mode menampilkan diagram langsung di `/dfd`.
+7. Static mode menulis `index.html`, SVG, JSON, dan asset viewer ke output folder.
 
 ## Development package
 
@@ -236,6 +292,12 @@ src/
   Renderer/
   Scanner/
   Support/
+public/
+  assets/
+    styles.css
+    viewer.js
+resources/
+  views/
 tests/
   Fixtures/
   Unit/
@@ -246,7 +308,9 @@ README.md
 
 ## Catatan penting
 
-Package ini menganalisis struktur aplikasi berdasarkan route, controller, model, dan pemakaian database yang bisa dibaca secara statis. Kalau logic aplikasi terlalu dinamis, misalnya route/controller dibuat runtime secara ajaib, hasil diagram bisa kurang lengkap. Ya namanya static analysis, bukan dukun santet.
+Package ini menganalisis struktur aplikasi berdasarkan route, controller, model, dan pemakaian database yang bisa dibaca secara statis. Kalau logic aplikasi terlalu dinamis, misalnya route/controller dibuat saat runtime, hasil diagram bisa kurang lengkap.
+
+Untuk live viewer, pastikan route package tidak diblokir middleware aplikasi. Secara default package memakai middleware `web`.
 
 ## License
 
